@@ -13,7 +13,7 @@ services:
     volumes:
       - data:/var/lib/mysql
     environment:
-      MYSQL_ROOT_PASSWORD: 3rpdc9TpAllqSzLUMFkOglslBIbOSzWS
+      MYSQL_ROOT_PASSWORD: secret
       MYSQL_DATABASE: data
 
 volumes:
