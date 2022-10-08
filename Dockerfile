@@ -11,7 +11,7 @@ RUN go mod download
 
 # 编译项目
 COPY ./server .
-RUN CGO_ENABLED=0 GOARCH=amd64 GOOS=linux go build -a -o server .
+RUN CGO_ENABLED=0 GOARCH=amd64 GOOS=linux go build -tags=jsoniter -a -o server .
 
 # 创建 npm 编译镜像
 FROM node:12-alpine as client-builder

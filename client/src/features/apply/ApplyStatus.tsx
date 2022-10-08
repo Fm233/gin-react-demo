@@ -9,7 +9,7 @@ import ProgressSuccess from './ProgressSuccess';
 
 const { Step } = Steps;
 
-const Progress: React.FC = () => {
+const ApplyStatus: React.FC = () => {
     const params = useParams()
     const result = useGetApplyQuery(params.bvid)
     let content, title2, desc2, title3, desc3, step
@@ -51,4 +51,4 @@ const Progress: React.FC = () => {
     )
 };
 
-export default Progress;
+export default ApplyStatus;

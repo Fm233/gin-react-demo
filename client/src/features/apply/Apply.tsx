@@ -8,7 +8,7 @@ const Apply: React.FC = () => {
     const [bv, setBV] = useState('');
     const [inError, setInError] = useState(false)
     const nav = useNavigate()
-    const [postApply, { isLoading }] = usePostApplyMutation();
+    const [postApply, { isLoading }] = usePostApplyMutation()
     const [errorMessage, setErrorMessage] = useState('')
     const alert = inError ? <Alert style={{ margin: '5px 0' }} message={errorMessage} type="error" /> : undefined
     return (
@@ -19,7 +19,7 @@ const Apply: React.FC = () => {
                 status={inError ? 'error' : ''}
                 value={bv}
                 loading={isLoading}
-                onChange={(e) => { setBV(e.target.value) }}
+                onChange={(e) => setBV(e.target.value)}
                 onSearch={async (value: string) => {
                     const bv = value.startsWith('BV') ? value : (value.startsWith('bv') ? 'BV' + value.substring(2) : 'BV' + value)
                     if (bv.length !== 12) {
@@ -29,16 +29,14 @@ const Apply: React.FC = () => {
                     }
                     try {
                         const result = await postApply({ bv }).unwrap()
-                        console.log(result)
-                        if (result["success"] === false) {
+                        if (!result.success) {
                             setInError(true)
-                            setErrorMessage(result["message"])
+                            setErrorMessage(result.message)
                             return
                         }
                         setInError(false)
                         nav(`/apply/${bv}`)
-                    }
-                    catch (err: any) {
+                    } catch (err: any) {
                         setInError(true)
                         console.log(err)
                         setErrorMessage("Some error occurred :(")

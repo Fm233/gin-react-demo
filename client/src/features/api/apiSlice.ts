@@ -30,8 +30,36 @@ export const apiSlice = createApi({
                 body
             }),
             invalidatesTags: ['audit' as any]
-        })
+        }),
+        getAuth: builder.query({
+            query: () => '/auth/check',
+            providesTags: ['auth' as any]
+        }),
+        postAuth: builder.mutation({
+            query: body => ({
+                url: `/auth`,
+                method: 'POST',
+                body
+            }),
+            invalidatesTags: ['auth' as any]
+        }),
+        getOwner: builder.query({
+            query: mid => `/owner/${mid}`
+        }),
+        getVideo: builder.query({
+            query: bvid => `/video/${bvid}`
+        }),
     })
 })
 
-export const { useGetCountQuery, usePostApplyMutation, useGetApplyQuery } = apiSlice
+export const {
+    useGetCountQuery,
+    useGetApplyQuery,
+    usePostApplyMutation,
+    useGetAuditQuery,
+    usePostAuditMutation,
+    useGetAuthQuery,
+    usePostAuthMutation,
+    useGetVideoQuery,
+    useGetOwnerQuery,
+} = apiSlice
