@@ -4,7 +4,9 @@ import { Frame } from './features/frame/Frame';
 import React from 'react';
 import { Route, Routes } from 'react-router-dom';
 import Main from './features/main/Main';
-import Progress from './features/apply/Progress';
+import ApplyStatus from './features/apply/ApplyStatus';
+import Auth from './features/auth/Auth';
+import Audit from './features/audit/Audit';
 
 const App: React.FC = () => {
   return (
@@ -12,7 +14,9 @@ const App: React.FC = () => {
       <Routes>
         <Route path="/" element={<Main />} />
         <Route path="/apply" element={<Apply />} />
-        <Route path="/apply/:bvid" element={<Progress />} />
+        <Route path="/apply/:bvid" element={<ApplyStatus />} />
+        <Route path="/auth" element={<Auth />} />
+        <Route path="/audit" element={<Audit />} />
       </Routes>
     </Frame>
   );
