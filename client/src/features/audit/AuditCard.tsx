@@ -26,11 +26,11 @@ async function audit(valid: boolean, bvid: string, time_ms: number, postAudit: F
 }
 
 const AuditCard = (props: any) => {
-    const bvid = props.video.bvid
+    const bvid = props.video["Bvid"]
     const video = useGetVideoQuery(bvid)
-    const owner = useGetOwnerQuery(props.video.owner.mid)
+    const owner = useGetOwnerQuery(props.video["Owner"]["Mid"])
     const [postAudit, { isLoading }] = usePostAuditMutation()
-    const [timeMs, setTimeMs] = useState(props.video.time_ms)
+    const [timeMs, setTimeMs] = useState(props.video["TimeMs"])
     const [modalOpen, setModalOpen] = useState(false)
     return (
         <>
@@ -39,7 +39,7 @@ const AuditCard = (props: any) => {
                 cover={
                     <img
                         alt="Cover"
-                        src={video.isSuccess ? video.data.data.pic : "logo512.png"}
+                        src={video.isSuccess ? video.data.pic : "logo512.png"}
                     />
                 }
                 actions={[
@@ -54,8 +54,8 @@ const AuditCard = (props: any) => {
             >
                 <Skeleton loading={video.isLoading || owner.isLoading} avatar active>
                     <Meta
-                        avatar={<Avatar src={owner.isSuccess ? owner.data.data.face : "favicon.ico"} />}
-                        title={owner.isSuccess ? owner.data.data.name : "昵称加载失败"}
+                        avatar={<Avatar src={owner.isSuccess ? owner.data.face : "favicon.ico"} />}
+                        title={owner.isSuccess ? owner.data.name : "昵称加载失败"}
                         description={timeMs}
                     />
                 </Skeleton>

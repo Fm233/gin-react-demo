@@ -51,6 +51,7 @@ func Auth(db *gorm.DB) func(ctx *gin.Context) {
 		// Modify session and respond
 		session := sessions.Default(ctx)
 		session.Set("password", password)
+		session.Save()
 		ctx.JSON(http.StatusCreated, gin.H{
 			"success": true,
 			"message": "Login successfully!",

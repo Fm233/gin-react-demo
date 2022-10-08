@@ -23,7 +23,7 @@ func Audit(db *gorm.DB) func(ctx *gin.Context) {
 		// Get videos
 		var videos []Video
 		{
-			err := db.Model(&Video{}).Where("pending = 1").Find(&videos).Error
+			err := db.Model(&Video{}).Preload("Owner").Where("pending = 1").Find(&videos).Error
 			if err != nil {
 				ctx.JSON(http.StatusOK, gin.H{
 					"success": false,
