@@ -1,4 +1,4 @@
-import { CloseCircleOutlined, CheckCircleOutlined, FieldTimeOutlined } from '@ant-design/icons';
+import { PlayCircleOutlined, CloseCircleOutlined, CheckCircleOutlined, FieldTimeOutlined } from '@ant-design/icons';
 import { Avatar, Card, Skeleton, message, Modal, Button, Input } from 'antd';
 import { useState } from 'react';
 import { useGetOwnerQuery, useGetVideoQuery, usePostAuditMutation } from '../api/apiSlice';
@@ -37,14 +37,18 @@ const AuditCard = (props: any) => {
             <Card
                 style={{ width: 300 }}
                 cover={
-                    <a href={`https://www.bilibili.com/video/${bvid}`} target="_blank" rel="noopener noreferrer">
-                        <img
-                            alt="Cover"
-                            src={video.isSuccess ? video.data.pic : "loading.png"}
-                        />
-                    </a>
+                    <img
+                        alt="Cover"
+                        src={video.isSuccess ? video.data.pic : "loading.png"}
+                    />
                 }
                 actions={[
+                    <PlayCircleOutlined
+                        key="play"
+                        href={`https://www.bilibili.com/video/${bvid}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                    />,
                     <FieldTimeOutlined key="time" onClick={() => setModalOpen(true)} />,
                     <CheckCircleOutlined key="check" onClick={
                         async () => await audit(true, bvid, timeMs, postAudit, isLoading)}
