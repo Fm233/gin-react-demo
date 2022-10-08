@@ -37,10 +37,12 @@ const AuditCard = (props: any) => {
             <Card
                 style={{ width: 300 }}
                 cover={
-                    <img
-                        alt="Cover"
-                        src={video.isSuccess ? video.data.pic : "logo512.png"}
-                    />
+                    <a href={`https://www.bilibili.com/video/${bvid}`} target="_blank" rel="noopener noreferrer">
+                        <img
+                            alt="Cover"
+                            src={video.isSuccess ? video.data.pic : "loading.png"}
+                        />
+                    </a>
                 }
                 actions={[
                     <FieldTimeOutlined key="time" onClick={() => setModalOpen(true)} />,
@@ -62,6 +64,13 @@ const AuditCard = (props: any) => {
             </Card>,
             <Modal
                 open={modalOpen}
+                onOk={
+                    async () => {
+                        await audit(true, bvid, timeMs, postAudit, isLoading)
+                        setModalOpen(false)
+                    }
+                }
+                onCancel={() => setModalOpen(false)}
                 footer={[
                     <Button
                         key="back"
