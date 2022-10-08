@@ -50,6 +50,8 @@ func main() {
 		{
 			lim.Use(RateLimitMiddleware(time.Second, 100, 10))
 			lim.POST("apply", Apply(db))
+			lim.GET("owner/:mid", ApiOwner(db))
+			lim.GET("video/:bv", ApiVideo(db))
 		}
 		unlim := api.Group("")
 		{

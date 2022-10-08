@@ -85,7 +85,7 @@ func AuditConfirm(db *gorm.DB) func(ctx *gin.Context) {
 		// Try get video from db
 		var videos []Video
 		{
-			err := db.Model(&Video{}).Where("bvid = ?", bv).Find(&videos).Error
+			err := db.Model(&Video{}).Preload("Owner").Where("bvid = ?", bv).Find(&videos).Error
 			if err != nil {
 				ctx.JSON(http.StatusCreated, gin.H{
 					"success": false,
