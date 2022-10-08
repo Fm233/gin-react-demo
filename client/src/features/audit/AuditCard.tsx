@@ -43,12 +43,11 @@ const AuditCard = (props: any) => {
                     />
                 }
                 actions={[
-                    <PlayCircleOutlined
-                        key="play"
-                        href={`https://www.bilibili.com/video/${bvid}`}
+                    <a href={`https://www.bilibili.com/video/${bvid}`}
                         target="_blank"
-                        rel="noopener noreferrer"
-                    />,
+                        rel="noopener noreferrer">
+                        <PlayCircleOutlined key="play" />
+                    </a>,
                     <FieldTimeOutlined key="time" onClick={() => setModalOpen(true)} />,
                     <CheckCircleOutlined key="check" onClick={
                         async () => await audit(true, bvid, timeMs, postAudit, isLoading)}
