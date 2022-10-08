@@ -1,4 +1,4 @@
-import { CloseCircleOutlined, CheckCircleOutlined, FieldTimeOutlined } from '@ant-design/icons';
+import { PlayCircleOutlined, CloseCircleOutlined, CheckCircleOutlined, FieldTimeOutlined } from '@ant-design/icons';
 import { Avatar, Card, Skeleton, message, Modal, Button, Input } from 'antd';
 import { useState } from 'react';
 import { useGetOwnerQuery, useGetVideoQuery, usePostAuditMutation } from '../api/apiSlice';
@@ -39,10 +39,15 @@ const AuditCard = (props: any) => {
                 cover={
                     <img
                         alt="Cover"
-                        src={video.isSuccess ? video.data.pic : "logo512.png"}
+                        src={video.isSuccess ? video.data.pic : "loading.png"}
                     />
                 }
                 actions={[
+                    <a href={`https://www.bilibili.com/video/${bvid}`}
+                        target="_blank"
+                        rel="noopener noreferrer">
+                        <PlayCircleOutlined key="play" />
+                    </a>,
                     <FieldTimeOutlined key="time" onClick={() => setModalOpen(true)} />,
                     <CheckCircleOutlined key="check" onClick={
                         async () => await audit(true, bvid, timeMs, postAudit, isLoading)}
@@ -62,6 +67,13 @@ const AuditCard = (props: any) => {
             </Card>,
             <Modal
                 open={modalOpen}
+                onOk={
+                    async () => {
+                        await audit(true, bvid, timeMs, postAudit, isLoading)
+                        setModalOpen(false)
+                    }
+                }
+                onCancel={() => setModalOpen(false)}
                 footer={[
                     <Button
                         key="back"

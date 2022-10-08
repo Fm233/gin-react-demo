@@ -9,7 +9,7 @@ export const apiSlice = createApi({
         }),
         getApply: builder.query({
             query: id => `/apply/${id}`,
-            providesTags: (result, error, arg) => [{ type: 'apply', id: arg } as any]
+            providesTags: (result, error, arg) => [{ type: 'apply', id: arg } as any],
         }),
         postApply: builder.mutation({
             query: body => ({
@@ -17,11 +17,11 @@ export const apiSlice = createApi({
                 method: 'POST',
                 body
             }),
-            invalidatesTags: (result, error, arg) => [{ type: 'apply', id: arg.bv } as any]
+            invalidatesTags: (result, error, arg) => [{ type: 'apply', id: arg.bv } as any],
         }),
         getAudit: builder.query({
             query: () => '/audit',
-            providesTags: ['audit' as any]
+            providesTags: ['audit' as any, 'auth' as any],
         }),
         postAudit: builder.mutation({
             query: body => ({
@@ -29,7 +29,7 @@ export const apiSlice = createApi({
                 method: 'POST',
                 body
             }),
-            invalidatesTags: ['audit' as any]
+            invalidatesTags: ['audit' as any],
         }),
         getAuth: builder.query({
             query: () => '/auth/check',
@@ -41,13 +41,15 @@ export const apiSlice = createApi({
                 method: 'POST',
                 body
             }),
-            invalidatesTags: ['auth' as any]
+            invalidatesTags: ['auth' as any],
         }),
         getOwner: builder.query({
-            query: mid => `/owner/${mid}`
+            query: mid => `/owner/${mid}`,
+            providesTags: ['auth' as any],
         }),
         getVideo: builder.query({
-            query: bvid => `/video/${bvid}`
+            query: bvid => `/video/${bvid}`,
+            providesTags: ['auth' as any],
         }),
     })
 })

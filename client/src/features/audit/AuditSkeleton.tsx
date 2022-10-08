@@ -1,4 +1,4 @@
-import { EditOutlined, EllipsisOutlined, SettingOutlined } from '@ant-design/icons';
+import { PlayCircleOutlined, EditOutlined, EllipsisOutlined, SettingOutlined } from '@ant-design/icons';
 import { Avatar, Card, Skeleton } from 'antd';
 import React from 'react';
 
@@ -11,10 +11,11 @@ const AuditSkeleton: React.FC = () => {
             cover={
                 <img
                     alt="Cover"
-                    src="logo512.png"
+                    src="loading.png"
                 />
             }
             actions={[
+                <PlayCircleOutlined key="play" />,
                 <SettingOutlined key="setting" />,
                 <EditOutlined key="edit" />,
                 <EllipsisOutlined key="ellipsis" />,
