@@ -1,7 +1,7 @@
 import { Button, Checkbox, Form, Input } from 'antd';
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { usePostAuthMutation } from '../api/apiSlice';
+import { useGetAuthQuery, usePostAuthMutation } from '../api/apiSlice';
 
 const Auth: React.FC = () => {
 
@@ -10,6 +10,8 @@ const Auth: React.FC = () => {
     const [inError, setInError] = useState(false)
     const [errorMessage, setErrorMessage] = useState('')
     const [postAuth, { isLoading }] = usePostAuthMutation();
+    const authCheck = useGetAuthQuery(undefined)
+    const isLogin = authCheck.isSuccess && authCheck.data.success
 
     return (
         <Form
@@ -50,6 +52,7 @@ const Auth: React.FC = () => {
                 <Button
                     type="primary"
                     htmlType="submit"
+                    disabled={isLogin}
                     loading={isLoading}
                     onClick={async () => {
                         try {
@@ -73,7 +76,7 @@ const Auth: React.FC = () => {
                             setErrorMessage("发生了错误 :(")
                         }
                     }}>
-                    登录
+                    {isLogin ? "已登录" : "登录"}
                 </Button>
             </Form.Item>
         </Form>
