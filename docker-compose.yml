@@ -4,7 +4,8 @@ services:
   server:
     image: bgoi-server:latest
     depends_on:
-      - mysql
+      mysql:
+        condition: service_healthy
     ports:
       - 8080:8080
 
@@ -13,8 +14,13 @@ services:
     volumes:
       - data:/var/lib/mysql
     environment:
-      MYSQL_ROOT_PASSWORD: secret
+      MYSQL_ROOT_PASSWORD: SLYwX1ptpSVHi17bqhlpoRF4p95kxkuxLh
       MYSQL_DATABASE: data
+    healthcheck:
+      test: curl --fail 'http://localhost:3306' || exit 1
+      interval: 10s
+      timeout: 1s
+      retries: 5
 
 volumes:
   data:

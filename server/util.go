@@ -7,7 +7,10 @@ import (
 )
 
 func Get(url string) []byte {
-	resp, err := http.Get(url)
+	client := &http.Client{}
+	req, _ := http.NewRequest("GET", url, nil)
+	req.Header.Set("User-Agent", "Mozilla/5.0 (X11; Linux x86_64; rv:109.0) Gecko/20100101 Firefox/110.0")
+	resp, err := client.Do(req)
 	if err != nil {
 		log.Fatalln(err)
 	}

@@ -32,6 +32,7 @@ func ApiOwner(db *gorm.DB) func(ctx *gin.Context) {
 				ctx.JSON(http.StatusCreated, gin.H{
 					"success": false,
 					"message": err.Error(),
+					"json":    ownerData,
 				})
 				return
 			}
