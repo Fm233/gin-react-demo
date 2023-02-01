@@ -45,14 +45,6 @@ export const apiSlice = createApi({
       }),
       invalidatesTags: ["auth" as any],
     }),
-    getOwner: builder.query({
-      query: (mid) => `/owner/${mid}`,
-      providesTags: ["auth" as any],
-    }),
-    getVideo: builder.query({
-      query: (bvid) => `/video/${bvid}`,
-      providesTags: ["auth" as any],
-    }),
   }),
 });
 
@@ -64,7 +56,4 @@ export const {
   usePostAuditMutation,
   useGetAuthQuery,
   usePostAuthMutation,
-  useGetVideoQuery,
-  useGetOwnerQuery,
 } = apiSlice;
-
