@@ -26,7 +26,12 @@ func ApplyStatus(db *gorm.DB) func(ctx *gin.Context) {
 			}
 		}
 		if len(videos) >= 2 {
-			log.Fatalln("Video count >= 2")
+			log.Println("[Error] Video count >= 2")
+			ctx.JSON(http.StatusCreated, gin.H{
+				"success": false,
+				"message": "数据库中有重复视频，请告知服务器管理员",
+			})
+			return
 		}
 		if len(videos) == 0 {
 			ctx.JSON(http.StatusOK, gin.H{
@@ -40,7 +45,7 @@ func ApplyStatus(db *gorm.DB) func(ctx *gin.Context) {
 		// Send response
 		ctx.JSON(http.StatusOK, gin.H{
 			"success":  true,
-			"owner_id": video.OwnerId,
+			"owner_id": video.OwnerID,
 			"pending":  video.Pending,
 			"valid":    video.Valid,
 		})

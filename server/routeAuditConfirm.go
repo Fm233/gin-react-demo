@@ -95,7 +95,12 @@ func AuditConfirm(db *gorm.DB) func(ctx *gin.Context) {
 			}
 		}
 		if len(videos) >= 2 {
-			log.Fatalln("Video count >= 2")
+			log.Println("[Error] Video count >= 2")
+			ctx.JSON(http.StatusCreated, gin.H{
+				"success": false,
+				"message": "数据库中有重复视频，请告知服务器管理员",
+			})
+			return
 		}
 		if len(videos) == 0 {
 			ctx.JSON(http.StatusCreated, gin.H{

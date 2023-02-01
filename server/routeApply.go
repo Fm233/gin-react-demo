@@ -22,7 +22,8 @@ func Apply(db *gorm.DB) func(ctx *gin.Context) {
 		if err != nil {
 			ctx.JSON(http.StatusCreated, gin.H{
 				"success": false,
-				"message": err.Error(),
+				"message": "读取请求时出错",
+				"error":   err.Error(),
 			})
 			return
 		}
@@ -32,7 +33,8 @@ func Apply(db *gorm.DB) func(ctx *gin.Context) {
 			if err != nil {
 				ctx.JSON(http.StatusCreated, gin.H{
 					"success": false,
-					"message": err.Error(),
+					"message": "获取 bv 号时出错",
+					"error":   err.Error(),
 				})
 				return
 			}
@@ -46,13 +48,20 @@ func Apply(db *gorm.DB) func(ctx *gin.Context) {
 			if err != nil {
 				ctx.JSON(http.StatusCreated, gin.H{
 					"success": false,
-					"message": err.Error(),
+					"message": "从数据库中获取视频数据时出错",
+					"error":   err.Error(),
 				})
 				return
 			}
 		}
 		if len(videos) >= 2 {
-			log.Fatalln("Video count >= 2")
+			log.Println("[ERROR] Video count >= 2")
+			ctx.JSON(http.StatusCreated, gin.H{
+				"success": false,
+				"message": "数据库中出现重复视频，请通知服务器管理员",
+				"error":   err.Error(),
+			})
+			return
 		}
 		if len(videos) != 0 {
 			ctx.JSON(http.StatusCreated, gin.H{
@@ -70,6 +79,18 @@ func Apply(db *gorm.DB) func(ctx *gin.Context) {
 			if err != nil {
 				ctx.JSON(http.StatusCreated, gin.H{
 					"success": false,
+					"message": "无法从 B 站获取视频发布者",
+					"error":   err.Error(),
+				})
+				return
+			}
+		}
+		picJson := jsoniter.Get(videoData, "data", "pic")
+		{
+			err := picJson.LastError()
+			if err != nil {
+				ctx.JSON(http.StatusCreated, gin.H{
+					"success": false,
 					"message": err.Error(),
 				})
 				return
@@ -81,7 +102,8 @@ func Apply(db *gorm.DB) func(ctx *gin.Context) {
 			if err != nil {
 				ctx.JSON(http.StatusCreated, gin.H{
 					"success": false,
-					"message": err.Error(),
+					"message": "无法从 B 站获取视频标题",
+					"error":   err.Error(),
 				})
 				return
 			}
@@ -101,44 +123,60 @@ func Apply(db *gorm.DB) func(ctx *gin.Context) {
 		}
 
 		// Check if contains a valid time
-		pattern := `(\d)?[m:分]?(\d{2})[s\.秒](\d{3})?`
+		pattern := `(?:(\d+)(?:min|[Mm:分]))?(\d+).?(\d+)?`
 		re := regexp.MustCompile(pattern)
 		params := re.FindStringSubmatch(title)
 		if len(params) == 0 {
 			ctx.JSON(http.StatusCreated, gin.H{
 				"success": false,
-				"message": "视频标题不含通关时间信息",
+				"message": "视频标题中未匹配到通关时间信息，请尽量使用 1m56.237s 的格式",
 			})
 			return
 		}
 		paramsLen := len(params) - 1
-		var ms int
+		if paramsLen != 3 {
+			ctx.JSON(http.StatusCreated, gin.H{
+				"success": false,
+				"message": "正则表达式匹配出的数组长度错误，请告知服务器管理员",
+			})
+			return
+		}
+		if len(params[3]) > 3 {
+			ctx.JSON(http.StatusCreated, gin.H{
+				"success": false,
+				"message": "毫秒位数太多啦！不会是 11.4514s 罢！",
+			})
+			return
+		}
 		paramsParsed := make([]int, paramsLen)
 		for i := 0; i < paramsLen; i++ {
-			res, err := strconv.Atoi(params[i+1])
-			if err != nil {
-				log.Fatalln(err)
-			}
-			paramsParsed[i] = res
-		}
-		if paramsLen == 1 {
-			ms = paramsParsed[0] * 1000
-		} else if paramsLen == 2 {
-			// Minute missing
-			if len(params[2]) == 3 {
-				ms = paramsParsed[0]*1000 + paramsParsed[1]
+			if params[i+1] == "" {
+				paramsParsed[i] = 0
 			} else {
-				// Worst-case scenario
-				ms = paramsParsed[0]*1000*60 + paramsParsed[1]*1000 + 999
+				res, err := strconv.Atoi(params[i+1])
+				if err != nil {
+					fmt.Printf("[ERROR] Error while splitting %s\n", title)
+					ctx.JSON(http.StatusCreated, gin.H{
+						"success": false,
+						"message": "匹配到了时间信息，但无法转换成数字，请告知服务器管理员",
+						"error":   err.Error(),
+					})
+					return
+				}
+				paramsParsed[i] = res
 			}
-		} else if paramsLen == 3 {
-			ms = paramsParsed[0]*1000*60 + paramsParsed[1]*1000 + paramsParsed[2]
 		}
+		ms := paramsParsed[2]
+		for i := 0; i < 3-len(params[3]); i++ {
+			ms *= 10
+		}
+		ms += paramsParsed[0]*1000*60 + paramsParsed[1]*1000
 		if ms >= MsUpperLimit {
 			ctx.JSON(http.StatusCreated, gin.H{
 				"success": false,
 				"message": "视频通关时间慢于 2m30s 的入会线",
 			})
+			// TODO 手机端支持
 			return
 		}
 
@@ -150,13 +188,19 @@ func Apply(db *gorm.DB) func(ctx *gin.Context) {
 			if err != nil {
 				ctx.JSON(http.StatusCreated, gin.H{
 					"success": false,
-					"message": err.Error(),
+					"message": "无法从数据库中获取频道所有者数据",
+					"error":   err.Error(),
 				})
 				return
 			}
 		}
 		if len(owners) >= 2 {
-			log.Fatalln("Owner 数量大于或等于两个！")
+			log.Println("[Error] Owner 数量大于或等于两个")
+			ctx.JSON(http.StatusCreated, gin.H{
+				"success": false,
+				"message": "Owner 数量大于或等于两个，请告知服务器管理员",
+			})
+			return
 		}
 		var owner Owner
 		if len(owners) == 1 {
@@ -169,12 +213,50 @@ func Apply(db *gorm.DB) func(ctx *gin.Context) {
 			}
 			owner = owners[0]
 		} else {
-			owner = Owner{Mid: mid, TimeMs: MsUpperLimit}
+			// Create owner with data cached from Bilibili
+			ownerData := Get(fmt.Sprintf(GetOwnerSite, mid))
+			nameJson := jsoniter.Get(ownerData, "data", "name")
+			{
+				err := nameJson.LastError()
+				if err != nil {
+					ctx.JSON(http.StatusCreated, gin.H{
+						"success": false,
+						"message": err.Error(),
+						"json":    ownerData,
+					})
+					return
+				}
+			}
+			faceJson := jsoniter.Get(ownerData, "data", "face")
+			{
+				err := faceJson.LastError()
+				if err != nil {
+					ctx.JSON(http.StatusCreated, gin.H{
+						"success": false,
+						"message": err.Error(),
+						"json":    ownerData,
+					})
+					return
+				}
+			}
+			owner = Owner{
+				Mid:    mid,
+				TimeMs: MsUpperLimit,
+				Name:   nameJson.ToString(),
+				Face:   faceJson.ToString(),
+			}
 			db.Create(&owner)
 		}
 
 		// Final success
-		db.Create(&Video{Bvid: bv, Owner: owner, TimeMs: ms, Pending: true, Valid: false})
+		db.Create(&Video{
+			Bvid:    bv,
+			Owner:   owner,
+			TimeMs:  ms,
+			Pending: true,
+			Valid:   false,
+			Pic:     picJson.ToString(),
+		})
 		ctx.JSON(http.StatusCreated, gin.H{
 			"success": true,
 			"message": "Created new entry",
