@@ -123,7 +123,7 @@ func Apply(db *gorm.DB) func(ctx *gin.Context) {
 		}
 
 		// Check if contains a valid time
-		pattern := `(?:(\d+)(?:min|[Mm:分]))?(\d+).?(\d+)?`
+		pattern := `(?:(\d+)(?:min|[Mm：:分]))?(\d+).?(\d+)?`
 		re := regexp.MustCompile(pattern)
 		params := re.FindStringSubmatch(title)
 		if len(params) == 0 {
