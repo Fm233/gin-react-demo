@@ -48,7 +48,8 @@ func main() {
 	{
 		lim := api.Group("")
 		{
-			lim.Use(RateLimitMiddleware(time.Second, 100, 10))
+			// lim.Use(RateLimitMiddleware(time.Second, 100, 10))
+			// TODO add video blacklist
 			lim.POST("apply", Apply(db))
 		}
 		unlim := api.Group("")

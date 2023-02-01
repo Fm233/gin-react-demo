@@ -6,7 +6,8 @@ import (
 
 type Owner struct {
 	gorm.Model
-	Mid    string
+	Mid string
+	// TODO 修掉中文报错
 	Name   string
 	Face   string
 	Videos []Video
