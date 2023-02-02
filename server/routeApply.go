@@ -7,7 +7,6 @@ import (
 	"net/http"
 	"regexp"
 	"strconv"
-	"strings"
 
 	jsoniter "github.com/json-iterator/go"
 
@@ -109,20 +108,8 @@ func Apply(db *gorm.DB) func(ctx *gin.Context) {
 			}
 		}
 
-		// Check if relates to goi
-		title := titleJson.ToString()
-		if !(strings.Contains(title, "goi") ||
-			strings.Contains(title, "GOI") ||
-			strings.Contains(title, "掘地求升") ||
-			strings.Contains(title, "和班尼特福迪一起攻克难关")) {
-			ctx.JSON(http.StatusCreated, gin.H{
-				"success": false,
-				"message": "视频标题与 GOI 无关",
-			})
-			return
-		}
-
 		// Check if contains a valid time
+		title := titleJson.ToString()
 		pattern := `(?:(\d+)(?:min|[Mm：:分]))?(\d+).?(\d+)?`
 		re := regexp.MustCompile(pattern)
 		params := re.FindStringSubmatch(title)
