@@ -254,7 +254,7 @@ func Apply(db *gorm.DB) func(ctx *gin.Context) {
 			Owner:   owner,
 			TimeMs:  ms,
 			Pending: true,
-			Valid:   false,
+			Valid:   true,
 			Pic:     picJson.ToString(),
 		})
 		ctx.JSON(http.StatusCreated, gin.H{

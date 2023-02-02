@@ -6,8 +6,7 @@ import (
 
 type Owner struct {
 	gorm.Model
-	Mid string
-	// TODO 修掉中文报错
+	Mid    string
 	Name   string
 	Face   string
 	Videos []Video
@@ -24,3 +23,8 @@ type Video struct {
 	Pending bool
 	Valid   bool
 }
+
+// Pending = false, Valid = true: 审核通过
+// Pending = false, Valid = false: 记录有争议
+// Pending = true, Valid = true: 待审核
+// Pending = true, Valid = false: 记录被忽略
