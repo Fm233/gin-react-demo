@@ -29,11 +29,12 @@ func RateLimitMiddleware(fillInterval time.Duration, cap, quantum int64) gin.Han
 func main() {
 	// Init database
 	db, err := gorm.Open(mysql.Open(DBStr), &gorm.Config{})
+	dbKey := "gorm:table_options"
+	dbValue := "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4"
+	db.Set(dbKey, dbValue).AutoMigrate(&Owner{}, &Video{})
 	if err != nil {
 		log.Fatalln(err)
 	}
-	db.AutoMigrate(&Owner{})
-	db.AutoMigrate(&Video{})
 
 	// Init cookie store
 	store := cookie.NewStore([]byte(SessionSecret))
