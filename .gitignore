@@ -19,6 +19,9 @@
 .env.production.local
 .VSCodeCounter
 
+# server
+server/**
+
 # secret
 **/secret.go
 docker-compose.yml
