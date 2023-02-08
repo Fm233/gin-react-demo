@@ -9,7 +9,7 @@ export const apiSlice = createApi({
     }),
     getApply: builder.query({
       query: (id) => `/apply/${id}`,
-      providesTags: (result, error, arg) => [{ type: "apply", id: arg } as any],
+      providesTags: (_res, _err, arg) => [{ type: "apply", id: arg } as any],
     }),
     postApply: builder.mutation({
       query: (body) => ({
@@ -17,9 +17,13 @@ export const apiSlice = createApi({
         method: "POST",
         body,
       }),
-      invalidatesTags: (result, error, arg) => [
+      invalidatesTags: (_res, _err, arg) => [
         { type: "apply", id: arg.bv } as any,
       ],
+    }),
+    getBoard: builder.query({
+      query: () => "/board",
+      providesTags: ["board" as any],
     }),
     getAudit: builder.query({
       query: () => "/audit",
@@ -53,6 +57,7 @@ export const {
   useGetApplyQuery,
   usePostApplyMutation,
   useGetAuditQuery,
+  useGetBoardQuery,
   usePostAuditMutation,
   useGetAuthQuery,
   usePostAuthMutation,
