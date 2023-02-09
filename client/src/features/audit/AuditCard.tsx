@@ -7,13 +7,15 @@ import {
 import { Avatar, Card, message, Modal, Button, Input } from "antd";
 import { useState } from "react";
 import { usePostAuditMutation } from "../api/apiSlice";
+import { Video } from "../model/Model";
 
 const { Meta } = Card;
 
 async function audit(
   valid: boolean,
+  pending: boolean,
   bvid: string,
-  time_ms: number,
+  timeMs: number,
   postAudit: Function,
   isLoading: boolean
 ) {
@@ -23,28 +25,29 @@ async function audit(
   try {
     const result = await postAudit({
       id: bvid,
-      time_ms,
-      valid,
+      TimeMs: timeMs,
+      Valid: valid,
+      Pending: pending,
     }).unwrap();
     if (!result.success) {
       message.error(result.message);
       return;
     }
     message.success("成功提交！");
-  } catch (err: any) {
+  } catch {
     message.error("提交失败……");
   }
 }
 
 const AuditCard = (props: any) => {
-  const video = props.video;
-  const pic = video["Pic"];
-  const bvid = video["Bvid"];
-  const owner = props.video["Owner"];
-  const ownerName = owner["Name"];
-  const face = owner["Face"];
+  const video: Video = props.video;
+  const pic = video.Pic;
+  const bvid = video.Bvid;
+  const owner = video.Owner;
+  const ownerName = owner.Name;
+  const face = owner.Face;
   const [postAudit, { isLoading }] = usePostAuditMutation();
-  const [timeMs, setTimeMs] = useState(props.video["TimeMs"]);
+  const [timeMs, setTimeMs] = useState(video.TimeMs);
   const [modalOpen, setModalOpen] = useState(false);
   return (
     <>
@@ -63,13 +66,13 @@ const AuditCard = (props: any) => {
           <CheckCircleOutlined
             key="check"
             onClick={async () =>
-              await audit(true, bvid, timeMs, postAudit, isLoading)
+              await audit(true, false, bvid, timeMs, postAudit, isLoading)
             }
           />,
           <CloseCircleOutlined
             key="close"
             onClick={async () =>
-              await audit(false, bvid, timeMs, postAudit, isLoading)
+              await audit(false, false, bvid, timeMs, postAudit, isLoading)
             }
           />,
         ]}
@@ -83,8 +86,9 @@ const AuditCard = (props: any) => {
       ,
       <Modal
         open={modalOpen}
+        // TODO onOk 的时候就 approve 是不是不太好
         onOk={async () => {
-          await audit(true, bvid, timeMs, postAudit, isLoading);
+          await audit(true, false, bvid, timeMs, postAudit, isLoading);
           setModalOpen(false);
         }}
         onCancel={() => setModalOpen(false)}
@@ -101,7 +105,7 @@ const AuditCard = (props: any) => {
             type="primary"
             loading={isLoading}
             onClick={async () => {
-              await audit(true, bvid, timeMs, postAudit, isLoading);
+              await audit(true, false, bvid, timeMs, postAudit, isLoading);
               setModalOpen(false);
             }}
           >
@@ -111,7 +115,7 @@ const AuditCard = (props: any) => {
             key="close"
             loading={isLoading}
             onClick={async () => {
-              await audit(false, bvid, timeMs, postAudit, isLoading);
+              await audit(false, false, bvid, timeMs, postAudit, isLoading);
               setModalOpen(false);
             }}
           >
@@ -123,7 +127,7 @@ const AuditCard = (props: any) => {
         <Input
           placeholder="通关时间……"
           value={timeMs}
-          onChange={(e) => setTimeMs(e.target.value)}
+          onChange={(e) => setTimeMs(+e.target.value)}
         />
       </Modal>
     </>
@@ -131,4 +135,3 @@ const AuditCard = (props: any) => {
 };
 
 export default AuditCard;
-

@@ -3,13 +3,14 @@ import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 export const apiSlice = createApi({
   reducerPath: "api",
   baseQuery: fetchBaseQuery({ baseUrl: "/api" }),
+  tagTypes: ["Video", "Auth"],
   endpoints: (builder) => ({
     getCount: builder.query({
       query: () => "/count",
     }),
     getApply: builder.query({
       query: (id) => `/apply/${id}`,
-      providesTags: (_res, _err, arg) => [{ type: "apply", id: arg } as any],
+      providesTags: ["Video"],
     }),
     postApply: builder.mutation({
       query: (body) => ({
@@ -17,17 +18,15 @@ export const apiSlice = createApi({
         method: "POST",
         body,
       }),
-      invalidatesTags: (_res, _err, arg) => [
-        { type: "apply", id: arg.bv } as any,
-      ],
+      invalidatesTags: ["Video"],
     }),
     getBoard: builder.query({
       query: () => "/board",
-      providesTags: ["board" as any],
+      providesTags: ["Video"],
     }),
     getAudit: builder.query({
       query: () => "/audit",
-      providesTags: ["audit" as any, "auth" as any],
+      providesTags: ["Video", "Auth"],
     }),
     postAudit: builder.mutation({
       query: (body) => ({
@@ -35,11 +34,11 @@ export const apiSlice = createApi({
         method: "POST",
         body,
       }),
-      invalidatesTags: ["audit" as any],
+      invalidatesTags: ["Video"],
     }),
     getAuth: builder.query({
       query: () => "/auth/check",
-      providesTags: ["auth" as any],
+      providesTags: ["Auth"],
     }),
     postAuth: builder.mutation({
       query: (body) => ({
@@ -47,7 +46,7 @@ export const apiSlice = createApi({
         method: "POST",
         body,
       }),
-      invalidatesTags: ["auth" as any],
+      invalidatesTags: ["Auth"],
     }),
   }),
 });
