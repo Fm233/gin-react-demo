@@ -1,6 +1,10 @@
-import { CloseCircleTwoTone, CheckCircleTwoTone } from "@ant-design/icons";
-import { message, Space, Skeleton, Table } from "antd";
-import React from "react";
+import {
+  CloseCircleTwoTone,
+  CheckCircleTwoTone,
+  DownOutlined,
+} from "@ant-design/icons";
+import { message, Menu, Dropdown, Space, Skeleton, Table } from "antd";
+import React, { useState, useMemo } from "react";
 import {
   useGetAuthQuery,
   useGetBoardQuery,
@@ -9,6 +13,7 @@ import {
 import BoardFail from "./BoardFail";
 import { Video } from "../model/Model";
 import type { ColumnsType } from "antd/es/table";
+import type { MenuProps } from "antd";
 
 interface DataType {
   key: string;
@@ -79,6 +84,7 @@ const columnsBase: ColumnsType<DataType> = [
 const Board: React.FC = () => {
   const videos = useGetBoardQuery(undefined);
   const authCheck = useGetAuthQuery(undefined);
+  const [viewMode, setViewMode] = useState(1);
   const isLogin = authCheck.isSuccess && authCheck.data.success;
   const [postAudit, { isLoading }] = usePostAuditMutation();
   const columnsAudit: ColumnsType<DataType> = [
@@ -100,7 +106,6 @@ const Board: React.FC = () => {
               )
             }
           />
-
           <CloseCircleTwoTone
             key="close"
             onClick={async () =>
@@ -120,32 +125,64 @@ const Board: React.FC = () => {
   ];
   // 即使强行 isLogin = true 发 POST, 后端也会再次判断是否登入, 因此别急
   const columns = isLogin ? columnsBase.concat(columnsAudit) : columnsBase;
-  let content, suffix;
-  if (videos.isLoading) {
-    content = <Skeleton />;
-  } else if (videos.isSuccess) {
-    if (videos.data.success) {
-      const data: DataType[] = videos.data.videos
-        .filter((video: Video) => !video.Pending)
+  const onClick = ({ key }: any) => {
+    setViewMode(+key);
+  };
+  const viewFilter = (video: Video) => {
+    if (viewMode === 3) {
+      return true;
+    } else if (viewMode === 2) {
+      return video.Valid;
+    } else {
+      return video.Valid && !video.Pending;
+    }
+  };
+  const data: DataType[] = useMemo(() => {
+    if (videos.isSuccess && videos.data.success) {
+      const videosData = videos.data.videos;
+      return videosData
+        .filter(viewFilter)
         .map((video: Video, index: number) => ({
           key: index + 1,
           name: video.Owner.Name,
           bvid: video.Bvid,
           timeMs: video.TimeMs,
         }));
-      content = <Table columns={columns} dataSource={data} />;
     } else {
-      suffix = <BoardFail message={videos.data.message} />;
+      return null;
+    }
+  }, [videos, viewMode]);
+  const menu = (
+    <Menu onClick={onClick}>
+      <Menu.Item key="1">只看已过审</Menu.Item>
+      <Menu.Item key="2">已过审和待审</Menu.Item>
+      <Menu.Item key="3">全部记录</Menu.Item>
+    </Menu>
+  );
+  if (videos.isLoading) {
+    return <Skeleton />;
+  } else if (videos.isSuccess) {
+    if (videos.data.success) {
+      return (
+        <>
+          <Dropdown overlay={menu}>
+            <a onClick={(e) => e.preventDefault()}>
+              <Space>
+                筛选
+                <DownOutlined />
+              </Space>
+            </a>
+          </Dropdown>
+          <div style={{ margin: "8px" }}></div>
+          <Table columns={columns} dataSource={data} />
+        </>
+      );
+    } else {
+      return <BoardFail message={videos.data.message} />;
     }
   } else {
-    suffix = <BoardFail message="网络异常" />;
+    return <BoardFail message="网络异常" />;
   }
-  return (
-    <>
-      {content}
-      {suffix}
-    </>
-  );
 };
 
 export default Board;
