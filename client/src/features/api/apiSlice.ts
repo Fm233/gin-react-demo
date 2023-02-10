@@ -36,6 +36,13 @@ export const apiSlice = createApi({
       }),
       invalidatesTags: ["Video"],
     }),
+    deleteAudit: builder.mutation({
+      query: (bvid) => ({
+        url: `/audit/${bvid}`,
+        method: "DELETE",
+      }),
+      invalidatesTags: ["Video"],
+    }),
     getAuth: builder.query({
       query: () => "/auth/check",
       providesTags: ["Auth"],
@@ -56,8 +63,9 @@ export const {
   useGetApplyQuery,
   usePostApplyMutation,
   useGetAuditQuery,
-  useGetBoardQuery,
   usePostAuditMutation,
+  useDeleteAuditMutation,
+  useGetBoardQuery,
   useGetAuthQuery,
   usePostAuthMutation,
 } = apiSlice;

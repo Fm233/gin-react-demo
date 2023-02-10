@@ -1,11 +1,13 @@
 import {
   CloseCircleTwoTone,
   CheckCircleTwoTone,
+  DeleteTwoTone,
   DownOutlined,
 } from "@ant-design/icons";
 import { message, Menu, Dropdown, Space, Skeleton, Table } from "antd";
 import React, { useState, useMemo } from "react";
 import {
+  useDeleteAuditMutation,
   useGetAuthQuery,
   useGetBoardQuery,
   usePostAuditMutation,
@@ -13,7 +15,6 @@ import {
 import BoardFail from "./BoardFail";
 import { Video } from "../model/Model";
 import type { ColumnsType } from "antd/es/table";
-import type { MenuProps } from "antd";
 
 interface DataType {
   key: string;
@@ -21,6 +22,26 @@ interface DataType {
   status: string;
   bvid: string;
   timeMs: number;
+}
+
+async function auditDelete(
+  bvid: string,
+  postDelete: Function,
+  isLoading: boolean
+) {
+  if (isLoading) {
+    return;
+  }
+  try {
+    const result = await postDelete(bvid).unwrap();
+    if (!result.success) {
+      message.error(result.message);
+      return;
+    }
+    message.success("成功提交！");
+  } catch {
+    message.error("提交失败……");
+  }
 }
 
 async function audit(
@@ -105,6 +126,7 @@ const Board: React.FC = () => {
   const [viewMode, setViewMode] = useState(1);
   const isLogin = authCheck.isSuccess && authCheck.data.success;
   const [postAudit, { isLoading }] = usePostAuditMutation();
+  const [postDelete, { isLoading: isDeleting }] = useDeleteAuditMutation();
   const columnsAudit: ColumnsType<DataType> = [
     {
       title: "操作",
@@ -135,6 +157,12 @@ const Board: React.FC = () => {
                 postAudit,
                 isLoading
               )
+            }
+          />
+          <DeleteTwoTone
+            key="delete"
+            onClick={async () =>
+              await auditDelete(record.bvid, postDelete, isDeleting)
             }
           />
         </Space>
