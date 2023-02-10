@@ -18,6 +18,7 @@ import type { MenuProps } from "antd";
 interface DataType {
   key: string;
   name: string;
+  status: string;
   bvid: string;
   timeMs: number;
 }
@@ -57,6 +58,11 @@ const columnsBase: ColumnsType<DataType> = [
     key: "key",
   },
   {
+    title: "状态",
+    dataIndex: "status",
+    key: "status",
+  },
+  {
     title: "玩家",
     dataIndex: "name",
     key: "name",
@@ -80,6 +86,18 @@ const columnsBase: ColumnsType<DataType> = [
     ),
   },
 ];
+
+function vidToStatus(video: Video) {
+  if (video.Valid && video.Pending) {
+    return "待审核";
+  } else if (video.Valid && !video.Pending) {
+    return "已过审";
+  } else if (!video.Valid && video.Pending) {
+    return "已忽略";
+  } else {
+    return "未过审";
+  }
+}
 
 const Board: React.FC = () => {
   const videos = useGetBoardQuery(undefined);
@@ -144,6 +162,7 @@ const Board: React.FC = () => {
         .filter(viewFilter)
         .map((video: Video, index: number) => ({
           key: index + 1,
+          status: vidToStatus(video),
           name: video.Owner.Name,
           bvid: video.Bvid,
           timeMs: video.TimeMs,
